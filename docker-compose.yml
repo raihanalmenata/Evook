@@ -1,0 +1,28 @@
+services:
+  
+  web_platform:
+    build: ./web
+    depends_on: app_service
+    volumes: ./web:/evook_web
+      - /evook_service/node_modules
+    ports: 5173:5173
+  
+  app_service:
+    build: ./service
+    env_file:
+      - ./service/.env
+    volumes: 
+      - /evook_service/node_modules
+      - ./service:/evook_service
+    ports: 
+      - ${SERVICE_PORT?error}:3000
+
+  app_database:
+    image: postgres:latest
+    env_file:
+      - ./service/.env
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD?error}
+      POSTGRES_DB: ${POSTGRES_DATABASE?error}
+    ports:
+      - ${POSTGRES_PORT?error}:5432
